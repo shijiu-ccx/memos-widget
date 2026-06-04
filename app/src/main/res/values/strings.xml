@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Memos 待办小组件</string>
+    <string name="settings_title">Memos 待办设置</string>
+    <string name="settings_description">配置后，小组件会显示最近 5 条包含 #todo 的 memo。</string>
+    <string name="server_url">Memos 服务器地址</string>
+    <string name="access_token">Access Token</string>
+    <string name="save_and_refresh">保存并刷新小组件</string>
+    <string name="widget_title">我的待办</string>
+    <string name="refresh">刷新</string>
+    <string name="loading">正在刷新…</string>
+    <string name="load_failed">加载失败，点击此处检查配置</string>
+    <string name="no_todos">暂无 #todo 待办</string>
+    <string name="widget_description">显示 Memos 中最近的待办事项</string>
+</resources>
+
