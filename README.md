@@ -1,5 +1,7 @@
 # Memos Glance
 
+[中文说明](README.zh-CN.md)
+
 Memos Glance is an Android home-screen widget for showing the latest unarchived memo from a Memos server.
 
 The app is written in Kotlin and uses OkHttp, DataStore, and Android AppWidget APIs.
@@ -118,4 +120,3 @@ Archived memo filtering checks common fields:
 - Support multiple widget configurations.
 - Add tag or filter selection.
 - Re-enable in-widget task syncing for launchers with stable widget item click support.
-
