@@ -14,6 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "MemosTodoWidget"
+rootProject.name = "MemosGlance"
 include(":app")
-

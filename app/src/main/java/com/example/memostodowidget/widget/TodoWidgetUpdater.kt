@@ -24,10 +24,12 @@ object TodoWidgetUpdater {
         val result = AppContainer.todoRepository(appContext).getRecentTodos(5)
         widgetIds.forEach { widgetId ->
             val views = result.fold(
-                onSuccess = { TodoWidgetRenderer.content(appContext, widgetId, it) },
+                onSuccess = { TodoWidgetRenderer.content(appContext, widgetId) },
                 onFailure = { TodoWidgetRenderer.error(appContext, widgetId, it.message.orEmpty()) }
             )
             manager.updateAppWidget(widgetId, views)
+            manager.notifyAppWidgetViewDataChanged(widgetId, com.example.memostodowidget.R.id.memo_list)
         }
     }
+
 }
