@@ -1,5 +1,6 @@
 *.iml
 .gradle
+.kotlin
 /local.properties
 /.idea
 /build
@@ -7,4 +8,9 @@
 .externalNativeBuild
 .cxx
 app/build
+
+# Local debug artifacts
+/*.png
+/*.xml
+/*.preferences_pb
 

@@ -8,6 +8,7 @@ data class TodoItem(
     val taskLines: List<TodoTaskLine>,
     val state: String,
     val visibility: String,
+    val pinned: Boolean,
     val createdAtEpochSeconds: Long,
     val webUrl: String
 )

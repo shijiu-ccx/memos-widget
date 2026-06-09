@@ -2,7 +2,7 @@
 
 [中文说明](README.zh-CN.md)
 
-Memos Glance is an Android home-screen widget for showing the latest unarchived memo from a Memos server.
+Memos Glance is an Android app and home-screen widget for quickly viewing and updating recent unarchived memos from a Memos server.
 
 The app is written in Kotlin and uses OkHttp, DataStore, and Android AppWidget APIs.
 
@@ -10,7 +10,11 @@ The app is written in Kotlin and uses OkHttp, DataStore, and Android AppWidget A
 
 - Configure Memos server URL and Access Token in the app.
 - Fetch memo data through the Memos REST API.
-- Show only the latest unarchived memo.
+- Browse recent unarchived memos in the app.
+- Publish new memos from the app.
+- Archive memos from the app.
+- Toggle Markdown task checkboxes from the app.
+- Show the latest unarchived memo in the widget.
 - Hide archived memo entries.
 - Display memo content in a scrollable widget area.
 - Render basic Markdown:
@@ -38,7 +42,7 @@ You can edit or check tasks in Memos, then tap the widget refresh button to upda
 2. Wait for Gradle sync to finish.
 3. Run the app.
 4. Enter your Memos server URL and Access Token.
-5. Tap "Save and refresh widget".
+5. Tap "Save and sign in".
 6. Add the "Memos Glance" widget to your Android home screen.
 
 Example server URL:
@@ -54,7 +58,7 @@ The Access Token should be generated from your Memos account settings.
 Debug build:
 
 ```powershell
-cd C:\Users\XFCY2\Desktop\memos_widget
+cd C:\Users\XFCY2\Desktop\memos-glance
 .\gradlew.bat assembleDebug
 ```
 
@@ -115,8 +119,6 @@ Archived memo filtering checks common fields:
 
 ## Future Ideas
 
-- Add memo creation.
-- Add an in-app Markdown preview.
 - Support multiple widget configurations.
 - Add tag or filter selection.
 - Re-enable in-widget task syncing for launchers with stable widget item click support.

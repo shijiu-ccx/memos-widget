@@ -15,6 +15,9 @@ data class MemosSettings(
 ) {
     val isConfigured: Boolean
         get() = serverUrl.isNotBlank() && accessToken.isNotBlank()
+
+    val hasServerUrl: Boolean
+        get() = serverUrl.isNotBlank()
 }
 
 class SettingsRepository(private val context: Context) {

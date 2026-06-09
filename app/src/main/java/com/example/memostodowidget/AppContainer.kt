@@ -15,6 +15,9 @@ object AppContainer {
     @Volatile
     private var todoRepository: TodoRepository? = null
 
+    @Volatile
+    private var apiClient: MemosApiClient? = null
+
     fun settingsRepository(context: Context): SettingsRepository =
         settingsRepository ?: synchronized(this) {
             settingsRepository ?: SettingsRepository(context.applicationContext).also {
@@ -26,14 +29,21 @@ object AppContainer {
         todoRepository ?: synchronized(this) {
             todoRepository ?: MemosTodoRepository(
                 settingsRepository = settingsRepository(context),
-                apiClient = MemosApiClient(
-                    OkHttpClient.Builder()
-                        .connectTimeout(15, TimeUnit.SECONDS)
-                        .readTimeout(20, TimeUnit.SECONDS)
-                        .build()
-                )
+                apiClient = memosApiClient()
             ).also {
                 todoRepository = it
+            }
+        }
+
+    fun memosApiClient(): MemosApiClient =
+        apiClient ?: synchronized(this) {
+            apiClient ?: MemosApiClient(
+                OkHttpClient.Builder()
+                    .connectTimeout(15, TimeUnit.SECONDS)
+                    .readTimeout(20, TimeUnit.SECONDS)
+                    .build()
+            ).also {
+                apiClient = it
             }
         }
 }

@@ -1,6 +1,6 @@
 # Memos Glance
 
-Memos Glance 是一个 Android 桌面小组件，用于在桌面快速查看 Memos 中最新一条未归档笔记。
+Memos Glance 是一个 Android App 和桌面小组件，用于快速查看和更新 Memos 中的未归档笔记。
 
 项目使用 Kotlin 开发，主要使用 OkHttp、DataStore 和 Android AppWidget API。
 
@@ -8,7 +8,11 @@ Memos Glance 是一个 Android 桌面小组件，用于在桌面快速查看 Mem
 
 - 在 App 内配置 Memos 服务器地址和 Access Token。
 - 通过 Memos REST API 获取 memo 列表。
-- 只显示最新一条未归档 memo。
+- 在 App 内浏览最近的未归档 memo。
+- 在 App 内发布新 memo。
+- 在 App 内归档 memo。
+- 在 App 内勾选 Markdown 任务框并同步回 Memos。
+- 在桌面小组件中显示最新一条未归档 memo。
 - 自动隐藏已归档 memo。
 - 在桌面小组件中用可滚动区域显示 memo 内容。
 - 支持基础 Markdown 显示：
@@ -36,7 +40,7 @@ Memos Glance 是一个 Android 桌面小组件，用于在桌面快速查看 Mem
 2. 等待 Gradle 同步完成。
 3. 运行 App。
 4. 填写 Memos 服务器地址和 Access Token。
-5. 点击“保存并刷新小组件”。
+5. 点击“保存并登录”。
 6. 回到系统桌面，添加 “Memos Glance” 小组件。
 
 服务器地址示例：
@@ -52,7 +56,7 @@ Access Token 需要在你的 Memos 账号设置中生成。
 调试版 APK：
 
 ```powershell
-cd C:\Users\XFCY2\Desktop\memos_widget
+cd C:\Users\XFCY2\Desktop\memos-glance
 .\gradlew.bat assembleDebug
 ```
 
@@ -113,8 +117,6 @@ GET /api/memo
 
 ## 后续可扩展方向
 
-- 新增 memo。
-- 在 App 内展示完整 Markdown 预览。
 - 支持多个小组件配置。
 - 支持选择标签或筛选条件。
 - 如果目标桌面启动器支持稳定点击事件，可以重新启用小组件内任务同步。

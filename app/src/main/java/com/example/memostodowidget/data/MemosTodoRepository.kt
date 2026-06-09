@@ -15,7 +15,7 @@ class MemosTodoRepository(
             check(settings.isConfigured) { "请先在 App 内配置 Memos 地址和 Access Token" }
 
             apiClient.fetchMemos(settings)
-                .sortedByDescending(TodoItem::createdAtEpochSeconds)
+                .sortedWith(compareByDescending<TodoItem> { it.pinned }.thenByDescending { it.createdAtEpochSeconds })
                 .take(limit)
         }
     }
