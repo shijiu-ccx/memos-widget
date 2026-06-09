@@ -2,9 +2,11 @@
 
 [中文说明](README.zh-CN.md)
 
-Memos Glance is an Android app and home-screen widget for quickly viewing and updating recent unarchived memos from a Memos server.
+Memos Glance is an Android app and home-screen widget for quickly viewing and updating unarchived memos from a Memos server.
 
-The app is written in Kotlin and uses OkHttp, DataStore, and Android AppWidget APIs.
+Current version: `1.0.0`
+
+The app is written in Kotlin and uses XML/ViewBinding, Compose Markdown, OkHttp, DataStore, and Android AppWidget APIs.
 
 ## Features
 
@@ -12,29 +14,31 @@ The app is written in Kotlin and uses OkHttp, DataStore, and Android AppWidget A
 - Fetch memo data through the Memos REST API.
 - Browse recent unarchived memos in the app.
 - Publish new memos from the app.
-- Archive memos from the app.
-- Toggle Markdown task checkboxes from the app.
-- Show the latest unarchived memo in the widget.
+- Edit, delete, pin, and archive memos from the app.
+- View archived memo history from the left drawer.
+- Toggle Markdown task checkboxes from the app and sync them back to Memos.
+- Insert Markdown snippets from the editor, including tasks, bold text, headings, lists, quotes, and code.
+- Show one unarchived memo in the widget, with a user setting for either the latest memo or a pinned memo.
 - Hide archived memo entries.
-- Display memo content in a scrollable widget area.
+- Add and refresh actions in the widget header.
+- Tap widget memo content to open the app.
+- Cache the last successfully displayed widget memo so transient refresh failures do not replace it with an error state.
 - Render basic Markdown:
   - headings
   - paragraphs
   - bullet lists
   - quotes
   - inline code
-  - links as readable text
+  - readable link text
   - task checkboxes, such as `- [ ]` and `- [x]`
-- Tap memo content in the widget to open the memo in a browser.
-- Refresh button in the widget header.
 
 ## Current Interaction Model
 
-Markdown task checkboxes are display-only inside the widget.
+Markdown task checkboxes can be toggled directly inside the app and are synced back to Memos. The UI updates optimistically so checking a task does not jump the feed back to the top.
 
-Some Android launchers do not reliably support click events inside scrollable widget list items. To keep the behavior stable, Memos Glance opens the memo page in a browser when the user taps widget content.
+Task checkboxes are display-only inside the widget. Tapping widget content opens the app, and tapping the plus button opens the new memo editor.
 
-You can edit or check tasks in Memos, then tap the widget refresh button to update the widget.
+When the memo currently shown in the widget is edited in the app, the widget first updates from the local edited content and then refreshes server data in the background.
 
 ## Setup
 
@@ -43,7 +47,8 @@ You can edit or check tasks in Memos, then tap the widget refresh button to upda
 3. Run the app.
 4. Enter your Memos server URL and Access Token.
 5. Tap "Save and sign in".
-6. Add the "Memos Glance" widget to your Android home screen.
+6. Choose whether the widget shows the latest memo or a pinned memo from the settings screen.
+7. Add the "Memos Glance" widget to your Android home screen.
 
 Example server URL:
 
@@ -54,6 +59,13 @@ https://memos.example.com
 The Access Token should be generated from your Memos account settings.
 
 ## Build APK
+
+Version:
+
+```text
+versionName 1.0.0
+versionCode 1
+```
 
 Debug build:
 
@@ -80,6 +92,7 @@ Build > Build Bundle(s) / APK(s) > Build APK(s)
 app/src/main/java/com/example/memostodowidget/
 ├── data/
 │   ├── MemosApiClient.kt
+│   ├── MemosJsonParser.kt
 │   ├── MemosTodoRepository.kt
 │   └── SettingsRepository.kt
 ├── domain/
@@ -90,6 +103,8 @@ app/src/main/java/com/example/memostodowidget/
 └── widget/
     ├── TodoWidgetProvider.kt
     ├── TodoWidgetRenderer.kt
+    ├── TodoWidgetUpdater.kt
+    ├── WidgetPreferences.kt
     ├── MemoRemoteViewsService.kt
     ├── MarkdownParser.kt
     └── MarkdownLine.kt
@@ -121,4 +136,4 @@ Archived memo filtering checks common fields:
 
 - Support multiple widget configurations.
 - Add tag or filter selection.
-- Re-enable in-widget task syncing for launchers with stable widget item click support.
+- Support richer Markdown rendering and attachment previews.

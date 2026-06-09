@@ -2,7 +2,9 @@
 
 Memos Glance 是一个 Android App 和桌面小组件，用于快速查看和更新 Memos 中的未归档笔记。
 
-项目使用 Kotlin 开发，主要使用 OkHttp、DataStore 和 Android AppWidget API。
+当前版本：`1.0.0`
+
+项目使用 Kotlin 开发，主要使用 XML/ViewBinding、Compose Markdown、OkHttp、DataStore 和 Android AppWidget API。
 
 ## 功能
 
@@ -10,11 +12,15 @@ Memos Glance 是一个 Android App 和桌面小组件，用于快速查看和更
 - 通过 Memos REST API 获取 memo 列表。
 - 在 App 内浏览最近的未归档 memo。
 - 在 App 内发布新 memo。
-- 在 App 内归档 memo。
+- 在 App 内编辑、删除、置顶和归档 memo。
+- 通过左侧菜单查看归档历史。
 - 在 App 内勾选 Markdown 任务框并同步回 Memos。
-- 在桌面小组件中显示最新一条未归档 memo。
+- 在 App 内使用 Markdown 快捷输入，例如任务框、加粗、标题、列表、引用和代码。
+- 在桌面小组件中显示一条未归档 memo，支持用户选择显示“最新 memo”或“置顶 memo”。
 - 自动隐藏已归档 memo。
-- 在桌面小组件中用可滚动区域显示 memo 内容。
+- 桌面小组件右上角提供新建和刷新按钮。
+- 点击小组件里的 memo 内容会进入 App 查看。
+- 小组件会缓存上一次成功展示的 memo，避免短暂刷新失败时变成错误状态。
 - 支持基础 Markdown 显示：
   - 标题
   - 普通段落
@@ -23,16 +29,14 @@ Memos Glance 是一个 Android App 和桌面小组件，用于快速查看和更
   - 行内代码
   - 链接文本
   - Markdown 任务框，例如 `- [ ]` 和 `- [x]`
-- 点击小组件内容会使用浏览器打开对应的 Memos 页面。
-- 小组件右上角提供刷新按钮。
 
 ## 当前交互说明
 
-小组件里的 Markdown 任务框只做显示，不支持在桌面中直接勾选。
+App 内的 Markdown 任务框可以直接勾选并同步到 Memos，界面会先本地更新，避免刷新后跳回顶部。
 
-原因是部分 Android 桌面启动器对“可滚动小组件列表项点击”的支持不稳定。为了保证行为可靠，Memos Glance 采用点击内容后跳转浏览器打开 Memos 页面的方式。
+小组件里的 Markdown 任务框只做显示，不支持在桌面中直接勾选。点击小组件内容会进入 App，点击右上角加号会直接进入新建 memo 编辑页。
 
-你可以在 Memos 页面里编辑或勾选任务，然后回到桌面点击小组件刷新按钮。
+你可以在 App 里编辑、勾选或发布 memo。修改当前小组件展示的 memo 后，小组件会优先使用本地更新后的内容，并在后台刷新服务器数据。
 
 ## 使用方式
 
@@ -41,7 +45,8 @@ Memos Glance 是一个 Android App 和桌面小组件，用于快速查看和更
 3. 运行 App。
 4. 填写 Memos 服务器地址和 Access Token。
 5. 点击“保存并登录”。
-6. 回到系统桌面，添加 “Memos Glance” 小组件。
+6. 在设置页选择小组件显示“最新 memo”或“置顶 memo”。
+7. 回到系统桌面，添加 “Memos Glance” 小组件。
 
 服务器地址示例：
 
@@ -52,6 +57,13 @@ https://memos.example.com
 Access Token 需要在你的 Memos 账号设置中生成。
 
 ## 打包 APK
+
+版本号：
+
+```text
+versionName 1.0.0
+versionCode 1
+```
 
 调试版 APK：
 
@@ -78,6 +90,7 @@ Build > Build Bundle(s) / APK(s) > Build APK(s)
 app/src/main/java/com/example/memostodowidget/
 ├── data/
 │   ├── MemosApiClient.kt
+│   ├── MemosJsonParser.kt
 │   ├── MemosTodoRepository.kt
 │   └── SettingsRepository.kt
 ├── domain/
@@ -88,6 +101,8 @@ app/src/main/java/com/example/memostodowidget/
 └── widget/
     ├── TodoWidgetProvider.kt
     ├── TodoWidgetRenderer.kt
+    ├── TodoWidgetUpdater.kt
+    ├── WidgetPreferences.kt
     ├── MemoRemoteViewsService.kt
     ├── MarkdownParser.kt
     └── MarkdownLine.kt
@@ -119,5 +134,4 @@ GET /api/memo
 
 - 支持多个小组件配置。
 - 支持选择标签或筛选条件。
-- 如果目标桌面启动器支持稳定点击事件，可以重新启用小组件内任务同步。
-
+- 支持更完整的 Markdown 渲染和附件预览。
