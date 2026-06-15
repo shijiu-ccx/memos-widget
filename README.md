@@ -2,25 +2,36 @@
 
 [中文说明](README.zh-CN.md)
 
-Memos Glance is an Android app and home-screen widget for quickly viewing and updating unarchived memos from a Memos server.
+Memos Glance is an Android app and home-screen widget for quickly viewing, editing, publishing, and updating memos from a Memos server.
 
-Current version: `1.0.0`
+Current version: `1.1.0`
 
-The app is written in Kotlin and uses XML/ViewBinding, Compose Markdown, OkHttp, DataStore, and Android AppWidget APIs.
+The app is written in Kotlin and uses XML/ViewBinding, Jetpack Compose, OkHttp, DataStore, and Android AppWidget APIs.
 
 ## Features
 
-- Configure Memos server URL and Access Token in the app.
-- Fetch memo data through the Memos REST API.
-- Browse recent unarchived memos in the app.
+- Configure a Memos server URL and Access Token in the app.
+- Fetch active and archived memos through the Memos REST API.
+- Browse recent active memos in the app.
 - Publish new memos from the app.
-- Edit, delete, pin, and archive memos from the app.
+- Edit, delete, pin, unpin, and archive memos from the app.
 - View archived memo history from the left drawer.
-- Toggle Markdown task checkboxes from the app and sync them back to Memos.
-- Insert Markdown snippets from the editor, including tasks, bold text, headings, lists, quotes, and code.
-- Show one unarchived memo in the widget, with a user setting for either the latest memo or a pinned memo.
-- Hide archived memo entries.
-- Add and refresh actions in the widget header.
+- Toggle Markdown task checkboxes in the app and sync changes back to Memos.
+- Toggle task checkboxes from the home-screen widget.
+- Render indented task lists, including space-indented tasks and list-style tasks such as `  - [ ] child task`.
+- Preserve indentation for nested tasks and bullet lists in the app and widget.
+- Insert Markdown snippets from the editor:
+  - task
+  - indent, which inserts two spaces
+  - bold
+  - heading
+  - list
+  - quote
+  - code
+- Keep the editor buttons visible above the keyboard by using a fixed-height, internally scrollable memo input box.
+- Show one active memo in the widget, with a setting for either the latest memo or a pinned memo.
+- Use the available widget height instead of truncating after a small fixed number of lines.
+- Add and refresh memos from the widget header.
 - Tap widget memo content to open the app.
 - Cache the last successfully displayed widget memo so transient refresh failures do not replace it with an error state.
 - Render basic Markdown:
@@ -36,7 +47,9 @@ The app is written in Kotlin and uses XML/ViewBinding, Compose Markdown, OkHttp,
 
 Markdown task checkboxes can be toggled directly inside the app and are synced back to Memos. The UI updates optimistically so checking a task does not jump the feed back to the top.
 
-Task checkboxes are display-only inside the widget. Tapping widget content opens the app, and tapping the plus button opens the new memo editor.
+Widget task checkboxes can also be toggled directly. The widget refreshes after the update so the displayed memo stays in sync with Memos.
+
+When editing a long memo, the memo input box keeps a fixed height and scrolls internally. The Markdown shortcut row and save button remain visible above the keyboard.
 
 When the memo currently shown in the widget is edited in the app, the widget first updates from the local edited content and then refreshes server data in the background.
 
@@ -63,14 +76,14 @@ The Access Token should be generated from your Memos account settings.
 Version:
 
 ```text
-versionName 1.0.0
-versionCode 1
+versionName 1.1.0
+versionCode 2
 ```
 
 Debug build:
 
 ```powershell
-cd C:\Users\XFCY2\Desktop\memos-glance
+cd C:\Users\PC\Desktop\memos-glance
 .\gradlew.bat assembleDebug
 ```
 
@@ -131,6 +144,23 @@ Archived memo filtering checks common fields:
 - `status = ARCHIVED`
 - `visibility = ARCHIVED`
 - `archived = true`
+
+## Release Notes
+
+### 1.1.0
+
+- Added nested task indentation support for space-indented and list-style Markdown tasks.
+- Made app and widget task checkboxes interactive and synced with Memos.
+- Fixed memo cards becoming too tall when rendering plain lists.
+- Fixed long memo editing so shortcut buttons and save stay visible above the keyboard.
+- Added an indent shortcut button that inserts two spaces.
+- Fixed the widget memo preview so it uses the available height instead of stopping after seven lines.
+- Added parser tests for indented tasks and lists.
+
+### 1.0.0
+
+- Added the full app experience for browsing, publishing, editing, deleting, pinning, archiving, and viewing archived memos.
+- Added widget support for latest or pinned memo display.
 
 ## Future Ideas
 

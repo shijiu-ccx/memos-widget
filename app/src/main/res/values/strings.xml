@@ -33,6 +33,7 @@
     <string name="empty_content">内容不能为空</string>
     <string name="empty_archive">暂无归档 memo</string>
     <string name="markdown_task">任务</string>
+    <string name="markdown_indent">缩进</string>
     <string name="markdown_bold">加粗</string>
     <string name="markdown_heading">标题</string>
     <string name="markdown_list">列表</string>

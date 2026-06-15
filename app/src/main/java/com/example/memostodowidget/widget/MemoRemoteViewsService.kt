@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.TypedValue
+import android.view.View
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import com.example.memostodowidget.AppContainer
@@ -49,18 +50,35 @@ private class MemoRemoteViewsFactory(
 
         views.setTextViewText(R.id.markdown_check, if (line.isChecked) "\u2611" else "\u2610")
         views.setTextViewText(R.id.markdown_text, line.text)
-        views.setViewVisibility(R.id.markdown_check, if (line.kind == MarkdownLine.Kind.Task) 0 else 4)
+        views.setViewVisibility(R.id.markdown_check, if (line.kind == MarkdownLine.Kind.Task) View.VISIBLE else View.INVISIBLE)
         views.setTextViewTextSize(R.id.markdown_text, TypedValue.COMPLEX_UNIT_SP, textSize(line))
+        views.setViewPadding(
+            R.id.markdown_row,
+            dp(BASE_START_PADDING_DP + line.indentLevel * INDENT_WIDTH_DP),
+            dp(VERTICAL_PADDING_DP),
+            dp(END_PADDING_DP),
+            dp(VERTICAL_PADDING_DP)
+        )
 
         memo?.let { currentMemo ->
-            val fillInIntent = Intent().apply {
+            val openMemoIntent = Intent().apply {
                 action = TodoWidgetProvider.ACTION_OPEN_MEMO
                 putExtra(TodoWidgetProvider.EXTRA_MEMO_URL, currentMemo.webUrl)
             }
 
-            views.setOnClickFillInIntent(R.id.markdown_row, fillInIntent)
-            views.setOnClickFillInIntent(R.id.markdown_check, fillInIntent)
-            views.setOnClickFillInIntent(R.id.markdown_text, fillInIntent)
+            views.setOnClickFillInIntent(R.id.markdown_row, openMemoIntent)
+            views.setOnClickFillInIntent(R.id.markdown_text, openMemoIntent)
+
+            if (line.kind == MarkdownLine.Kind.Task && line.lineIndex != null) {
+                val toggleTaskIntent = Intent().apply {
+                    action = TodoWidgetProvider.ACTION_TOGGLE_TASK
+                    putExtra(TodoWidgetProvider.EXTRA_LINE_INDEX, line.lineIndex)
+                    putExtra(TodoWidgetProvider.EXTRA_CHECKED, !line.isChecked)
+                }
+                views.setOnClickFillInIntent(R.id.markdown_check, toggleTaskIntent)
+            } else {
+                views.setOnClickFillInIntent(R.id.markdown_check, openMemoIntent)
+            }
         }
 
         return views
@@ -80,4 +98,18 @@ private class MemoRemoteViewsFactory(
             MarkdownLine.Kind.Code -> 13f
             else -> 14f
         }
+
+    private fun dp(value: Int): Int =
+        TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            value.toFloat(),
+            context.resources.displayMetrics
+        ).toInt()
+
+    private companion object {
+        const val BASE_START_PADDING_DP = 8
+        const val END_PADDING_DP = 8
+        const val VERTICAL_PADDING_DP = 4
+        const val INDENT_WIDTH_DP = 18
+    }
 }

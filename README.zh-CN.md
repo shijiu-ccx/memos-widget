@@ -1,25 +1,36 @@
 # Memos Glance
 
-Memos Glance 是一个 Android App 和桌面小组件，用于快速查看和更新 Memos 中的未归档笔记。
+Memos Glance 是一个 Android App 和桌面小组件，用来快速查看、编辑、发布和更新 Memos 服务器中的 memo。
 
-当前版本：`1.0.0`
+当前版本：`1.1.0`
 
-项目使用 Kotlin 开发，主要使用 XML/ViewBinding、Compose Markdown、OkHttp、DataStore 和 Android AppWidget API。
+项目使用 Kotlin 开发，主要使用 XML/ViewBinding、Jetpack Compose、OkHttp、DataStore 和 Android AppWidget API。
 
 ## 功能
 
 - 在 App 内配置 Memos 服务器地址和 Access Token。
-- 通过 Memos REST API 获取 memo 列表。
+- 通过 Memos REST API 获取未归档和已归档 memo。
 - 在 App 内浏览最近的未归档 memo。
 - 在 App 内发布新 memo。
-- 在 App 内编辑、删除、置顶和归档 memo。
-- 通过左侧菜单查看归档历史。
-- 在 App 内勾选 Markdown 任务框并同步回 Memos。
-- 在 App 内使用 Markdown 快捷输入，例如任务框、加粗、标题、列表、引用和代码。
-- 在桌面小组件中显示一条未归档 memo，支持用户选择显示“最新 memo”或“置顶 memo”。
-- 自动隐藏已归档 memo。
+- 在 App 内编辑、删除、置顶、取消置顶和归档 memo。
+- 通过左侧抽屉查看归档历史。
+- 在 App 内勾选 Markdown 任务框，并同步回 Memos。
+- 在桌面小组件里直接勾选任务框。
+- 支持缩进任务列表，包括空格缩进任务和 `  - [ ] 子任务` 这样的列表任务。
+- App 和小组件都会保留嵌套任务、普通列表的缩进层级。
+- 编辑器支持 Markdown 快捷输入：
+  - 任务
+  - 缩进，点击后插入两个空格
+  - 加粗
+  - 标题
+  - 列表
+  - 引用
+  - 代码
+- 编辑长 memo 时，输入框固定高度并在框内滚动，快捷按钮和保存按钮会保持在输入法上方。
+- 在桌面小组件中显示一条未归档 memo，可选择显示“最新 memo”或“置顶 memo”。
+- 小组件会充分利用可用高度，不再固定只显示少量行。
 - 桌面小组件右上角提供新建和刷新按钮。
-- 点击小组件里的 memo 内容会进入 App 查看。
+- 点击小组件里的 memo 内容会进入 App。
 - 小组件会缓存上一次成功展示的 memo，避免短暂刷新失败时变成错误状态。
 - 支持基础 Markdown 显示：
   - 标题
@@ -32,11 +43,13 @@ Memos Glance 是一个 Android App 和桌面小组件，用于快速查看和更
 
 ## 当前交互说明
 
-App 内的 Markdown 任务框可以直接勾选并同步到 Memos，界面会先本地更新，避免刷新后跳回顶部。
+App 内的 Markdown 任务框可以直接勾选并同步到 Memos。界面会先本地更新，避免勾选任务后列表跳回顶部。
 
-小组件里的 Markdown 任务框只做显示，不支持在桌面中直接勾选。点击小组件内容会进入 App，点击右上角加号会直接进入新建 memo 编辑页。
+桌面小组件里的任务框也可以直接勾选。更新完成后，小组件会刷新显示内容，保持和 Memos 同步。
 
-你可以在 App 里编辑、勾选或发布 memo。修改当前小组件展示的 memo 后，小组件会优先使用本地更新后的内容，并在后台刷新服务器数据。
+编辑长 memo 时，正文输入框保持固定高度，内容在输入框内部滚动。Markdown 快捷按钮行和保存按钮会保持在输入法上方。
+
+修改当前小组件展示的 memo 后，小组件会优先使用本地更新后的内容，并在后台刷新服务器数据。
 
 ## 使用方式
 
@@ -61,14 +74,14 @@ Access Token 需要在你的 Memos 账号设置中生成。
 版本号：
 
 ```text
-versionName 1.0.0
-versionCode 1
+versionName 1.1.0
+versionCode 2
 ```
 
 调试版 APK：
 
 ```powershell
-cd C:\Users\XFCY2\Desktop\memos-glance
+cd C:\Users\PC\Desktop\memos-glance
 .\gradlew.bat assembleDebug
 ```
 
@@ -129,6 +142,23 @@ GET /api/memo
 - `status = ARCHIVED`
 - `visibility = ARCHIVED`
 - `archived = true`
+
+## 发布说明
+
+### 1.1.0
+
+- 支持空格缩进和列表写法的嵌套 Markdown 任务。
+- App 和桌面小组件中的任务框都可以直接勾选并同步到 Memos。
+- 修复普通列表导致 memo 卡片异常变高的问题。
+- 修复编辑长 memo 时快捷按钮和保存按钮被输入法遮挡的问题。
+- 新增“缩进”快捷按钮，一键插入两个空格。
+- 修复小组件预览固定只显示少量行的问题，现在会利用可用高度。
+- 增加缩进任务和列表解析测试。
+
+### 1.0.0
+
+- 增加完整 App 体验：浏览、发布、编辑、删除、置顶、归档和查看归档 memo。
+- 增加桌面小组件，可显示最新 memo 或置顶 memo。
 
 ## 后续可扩展方向
 

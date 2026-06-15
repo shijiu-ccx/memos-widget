@@ -146,12 +146,15 @@ object TodoWidgetRenderer {
         val lines = MarkdownParser.parse(rawContent)
             .filter { it.text.isNotBlank() }
             .map { line ->
+                val indent = " ".repeat(line.indentLevel * SPACES_PER_INDENT)
                 when {
-                    line.kind == MarkdownLine.Kind.Task && line.isChecked -> "☑ ${line.text}"
-                    line.kind == MarkdownLine.Kind.Task -> "☐ ${line.text}"
-                    else -> line.text
+                    line.kind == MarkdownLine.Kind.Task && line.isChecked -> "$indent\u2611 ${line.text}"
+                    line.kind == MarkdownLine.Kind.Task -> "$indent\u2610 ${line.text}"
+                    else -> "$indent${line.text}"
                 }
             }
         return lines.joinToString("\n").ifBlank { "Memo" }
     }
+
+    private const val SPACES_PER_INDENT = 2
 }

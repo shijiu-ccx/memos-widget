@@ -4,6 +4,7 @@ import android.graphics.Typeface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.LinearLayout
@@ -44,7 +45,6 @@ import com.example.memostodowidget.widget.WidgetPreferences
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.snackbar.Snackbar
-import com.mikepenz.markdown.m3.Markdown
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -69,6 +69,7 @@ class MainActivity : AppCompatActivity() {
 
         settingsRepository = AppContainer.settingsRepository(this)
         configureActions()
+        configureEditorInput()
         configureWidgetMode()
         configureBackNavigation()
 
@@ -123,6 +124,9 @@ class MainActivity : AppCompatActivity() {
         binding.markdownTaskButton.setOnClickListener {
             insertMarkdownSnippet("- [ ] ", "")
         }
+        binding.markdownIndentButton.setOnClickListener {
+            insertMarkdownSnippet("  ", "")
+        }
         binding.markdownBoldButton.setOnClickListener {
             insertMarkdownSnippet("**", "**", "加粗文字")
         }
@@ -137,6 +141,20 @@ class MainActivity : AppCompatActivity() {
         }
         binding.markdownCodeButton.setOnClickListener {
             insertMarkdownSnippet("`", "`", "代码")
+        }
+    }
+
+    private fun configureEditorInput() {
+        binding.memoContentInput.apply {
+            isVerticalScrollBarEnabled = true
+            overScrollMode = View.OVER_SCROLL_IF_CONTENT_SCROLLS
+            setOnTouchListener { view, event ->
+                view.parent.requestDisallowInterceptTouchEvent(true)
+                if (event.action == MotionEvent.ACTION_UP || event.action == MotionEvent.ACTION_CANCEL) {
+                    view.parent.requestDisallowInterceptTouchEvent(false)
+                }
+                false
+            }
         }
     }
 
@@ -471,6 +489,7 @@ class MainActivity : AppCompatActivity() {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 if (line.kind == MarkdownLine.Kind.Spacer) dp(8) else LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
+                marginStart = dp(line.indentLevel * MARKDOWN_INDENT_WIDTH_DP)
                 topMargin = when (line.kind) {
                     MarkdownLine.Kind.Heading -> dp(10)
                     MarkdownLine.Kind.Spacer -> 0
@@ -849,76 +868,58 @@ private fun MemoMarkdown(
     onTaskCheckedChange: (lineIndex: Int, checked: Boolean) -> Unit
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        splitMarkdownBlocks(content).forEach { block ->
-            when (block) {
-                is MemoMarkdownBlock.MarkdownText -> {
-                    if (block.content.isNotBlank()) {
-                        androidx.compose.foundation.layout.Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable(onClick = onTextClick)
-                        ) {
-                            Markdown(block.content)
-                        }
-                        Spacer(modifier = Modifier.height(6.composeDp))
-                    }
-                }
+        MarkdownParser.parse(content).forEach { line ->
+            val lineModifier = Modifier
+                .fillMaxWidth()
+                .padding(start = (line.indentLevel * MARKDOWN_INDENT_WIDTH_DP).composeDp)
 
-                is MemoMarkdownBlock.Task -> {
+            when (line.kind) {
+                MarkdownLine.Kind.Spacer -> Spacer(modifier = Modifier.height(8.composeDp))
+
+                MarkdownLine.Kind.Task -> {
+                    val lineIndex = line.lineIndex
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                onTaskCheckedChange(block.lineIndex, !block.checked)
+                        modifier = lineModifier
+                            .clickable(enabled = lineIndex != null) {
+                                if (lineIndex != null) {
+                                    onTaskCheckedChange(lineIndex, !line.isChecked)
+                                }
                             }
                             .padding(vertical = 2.composeDp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Checkbox(
-                            checked = block.checked,
-                            onCheckedChange = { checked ->
-                                onTaskCheckedChange(block.lineIndex, checked)
+                            checked = line.isChecked,
+                            onCheckedChange = if (lineIndex == null) {
+                                null
+                            } else {
+                                { checked -> onTaskCheckedChange(lineIndex, checked) }
                             }
                         )
                         Text(
-                            text = block.text,
+                            text = line.text,
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.padding(start = 2.composeDp)
                         )
                     }
                 }
+
+                else -> {
+                    Text(
+                        text = line.text,
+                        style = when (line.kind) {
+                            MarkdownLine.Kind.Heading -> MaterialTheme.typography.titleMedium
+                            MarkdownLine.Kind.Code -> MaterialTheme.typography.bodyMedium
+                            else -> MaterialTheme.typography.bodyLarge
+                        },
+                        modifier = lineModifier
+                            .clickable(onClick = onTextClick)
+                            .padding(vertical = 3.composeDp)
+                    )
+                }
             }
         }
     }
-}
-
-private fun splitMarkdownBlocks(content: String): List<MemoMarkdownBlock> {
-    val blocks = mutableListOf<MemoMarkdownBlock>()
-    val markdownBuffer = StringBuilder()
-
-    fun flushMarkdown() {
-        if (markdownBuffer.isNotEmpty()) {
-            blocks += MemoMarkdownBlock.MarkdownText(markdownBuffer.toString().trimEnd())
-            markdownBuffer.clear()
-        }
-    }
-
-    content.lines().forEachIndexed { index, line ->
-        val match = TASK_MARKDOWN_LINE.find(line)
-        if (match == null) {
-            markdownBuffer.appendLine(line)
-        } else {
-            flushMarkdown()
-            blocks += MemoMarkdownBlock.Task(
-                lineIndex = index,
-                checked = match.groupValues[1].equals("x", ignoreCase = true),
-                text = match.groupValues[2].trim()
-            )
-        }
-    }
-    flushMarkdown()
-
-    return blocks
 }
 
 private fun TodoItem.withTaskLineChecked(lineIndex: Int, checked: Boolean): TodoItem {
@@ -943,15 +944,5 @@ private fun TodoItem.withTaskLineChecked(lineIndex: Int, checked: Boolean): Todo
     )
 }
 
-private sealed interface MemoMarkdownBlock {
-    data class MarkdownText(val content: String) : MemoMarkdownBlock
-
-    data class Task(
-        val lineIndex: Int,
-        val checked: Boolean,
-        val text: String
-    ) : MemoMarkdownBlock
-}
-
-private val TASK_MARKDOWN_LINE = Regex("^\\s*(?:[-*+]\\s+)?\\[([ xX])]\\s+(.+)$")
+private const val MARKDOWN_INDENT_WIDTH_DP = 18
 private val CHECKBOX_MARKDOWN_STATE = Regex("^(\\s*(?:[-*+]\\s+)?)(?:\\[[ xX]\\])")
